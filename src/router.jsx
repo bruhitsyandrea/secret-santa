@@ -8,11 +8,9 @@ import Dashboard from "./pages/Dashboard";
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/create", element: <CreateRoom /> },
-  { path: "/join/:roomId", element: <JoinRoom /> },
+  { path: "/join", element: <JoinRoom /> },        // ✅ for manual Room ID entry
+  { path: "/join/:roomId", element: <JoinRoom /> }, // ✅ for direct invite link
   { path: "/dashboard/:roomId", element: <Dashboard /> },
-  { path: "/join", element: <JoinRoom /> },
-  { path: "/join/:roomId", element: <JoinRoom /> },
-
 ]);
 
 export default function AppRouter() {
