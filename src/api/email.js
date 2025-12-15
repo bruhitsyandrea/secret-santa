@@ -1,6 +1,6 @@
 export async function sendEmail({ to, subject, html }) {
-    const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-    const FROM_EMAIL = import.meta.env.VITE_FROM_EMAIL;
+    const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
+    const FROM_EMAIL = import.meta.env.FROM_EMAIL;
   
     if (!RESEND_API_KEY || !FROM_EMAIL) {
       console.error("❌ Missing VITE_RESEND_API_KEY or VITE_FROM_EMAIL in environment variables.");
