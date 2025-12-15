@@ -52,6 +52,7 @@ export default function Dashboard() {
           <p>Be creative, kind, and have fun!</p>
         `,
       });
+      await new Promise(res => setTimeout(res, 1000));
     });
 
     await Promise.all(tasks);
