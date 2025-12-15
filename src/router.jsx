@@ -8,6 +8,7 @@ const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/create", element: <CreateRoom /> },
   { path: "/join/:roomId", element: <JoinRoom /> },
+  { path: "/dashboard/:roomId", element: <Dashboard /> },
 ]);
 
 export default function AppRouter() {

@@ -1,61 +1,33 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { supabase } from "../api/supabase";
-import { assignPairs } from "../utils/assignPairs";
-import { sendEmail } from "../api/email"; // you’ll make this next
 
-export default function Dashboard({ roomId }) {
+export default function Dashboard() {
+  const { roomId } = useParams();
   const [participants, setParticipants] = useState([]);
-  const [status, setStatus] = useState("");
 
   useEffect(() => {
-    loadParticipants();
-  }, []);
-
-  async function loadParticipants() {
-    const { data, error } = await supabase
-      .from("participants")
-      .select("*")
-      .eq("room_id", roomId);
-    if (error) console.error(error);
-    else setParticipants(data);
-  }
-
-  async function startSecretSanta() {
-    if (participants.length < 2) {
-      setStatus("Need at least 2 participants!");
-      return;
-    }
-
-    const pairs = assignPairs(participants);
-
-    setStatus("Assigning and sending emails...");
-
-    // Save to DB + send email for each
-    for (const pair of pairs) {
-      const giver = participants.find((p) => p.id === pair.giverId);
-      const receiver = participants.find((p) => p.id === pair.receiverId);
-
-      await supabase
+    async function fetchParticipants() {
+      const { data, error } = await supabase
         .from("participants")
-        .update({ assigned_to: pair.receiverId })
-        .eq("id", pair.giverId);
-
-      await sendEmail({
-        to: giver.email,
-        subject: "🎅 Your Secret Santa Assignment!",
-        html: `<p>Hi ${giver.name},<br />You’ll be gifting to <b>${receiver.name}</b>! 🎁</p>`,
-      });
+        .select("*")
+        .eq("room_id", roomId);
+      if (!error) setParticipants(data);
     }
-
-    setStatus("All assignments complete!");
-  }
+    fetchParticipants();
+  }, [roomId]);
 
   return (
     <div style={{ textAlign: "center", padding: "40px" }}>
-      <h2>Host Dashboard</h2>
-      <p>Participants: {participants.length}</p>
-      <button onClick={startSecretSanta}>Start Secret Santa</button>
-      {status && <p>{status}</p>}
+      <h2>🎅 Room Dashboard</h2>
+      <p>Room ID: {roomId}</p>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {participants.map((p) => (
+          <li key={p.id}>
+            {p.name} — {p.email}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
