@@ -82,12 +82,7 @@ export default function CreateRoom() {
 
           <div style={{ marginTop: "10px" }}>
             <button onClick={handleCopyRoomId}>Copy Room ID</button>
-            <button
-              onClick={handleCopyInviteLink}
-              style={{ marginLeft: "10px" }}
-            >
-              Copy Invite Link
-            </button>
+            
           </div>
 
           {copied && <p style={{ color: "green" }}>{copied}</p>}
