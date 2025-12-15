@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../api/supabase";
+import { Link } from "react-router-dom";
 
 export default function CreateRoom() {
   const [name, setName] = useState("");
@@ -33,27 +34,38 @@ export default function CreateRoom() {
   return (
     <div style={{ textAlign: "center", padding: "40px" }}>
       <h2>Create a Room</h2>
+
       <input
         placeholder="Room name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         style={{ display: "block", margin: "10px auto", padding: "8px" }}
       />
+
       <input
         placeholder="Your email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         style={{ display: "block", margin: "10px auto", padding: "8px" }}
       />
+
       <button onClick={handleCreate} style={{ marginTop: "10px" }}>
         Create Room
       </button>
 
       {status && <p>{status}</p>}
+
       {roomId && (
-        <p>
-          Room ID: <strong>{roomId}</strong>
-        </p>
+        <div style={{ marginTop: "20px" }}>
+          <p>✅ Room created!</p>
+          <p>
+            Share this link with your friends:  
+            <br />
+            <Link to={`/join/${roomId}`}>
+              {window.location.origin}/join/{roomId}
+            </Link>
+          </p>
+        </div>
       )}
     </div>
   );
