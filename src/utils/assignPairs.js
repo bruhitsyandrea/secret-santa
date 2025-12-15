@@ -1,4 +1,4 @@
-// Random Secret Santa pairing
+// Randomly assign each participant to another
 export function assignPairs(participants) {
     const givers = [...participants];
     const receivers = [...participants];
@@ -9,14 +9,13 @@ export function assignPairs(participants) {
       [receivers[i], receivers[j]] = [receivers[j], receivers[i]];
     }
   
-    // Ensure no one gets themselves (reshuffle if needed)
+    // Avoid self-assignment
     for (let i = 0; i < givers.length; i++) {
       if (givers[i].id === receivers[i].id) {
-        return assignPairs(participants); // retry
+        return assignPairs(participants); // retry if conflict
       }
     }
   
-    // Map giver → receiver
     return givers.map((g, i) => ({
       giverId: g.id,
       receiverId: receivers[i].id,

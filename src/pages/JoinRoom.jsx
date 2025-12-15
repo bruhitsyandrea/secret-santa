@@ -3,28 +3,30 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../api/supabase";
 
 export default function JoinRoom() {
-  const { roomId } = useParams();
+  const { roomId: paramRoomId } = useParams();
   const navigate = useNavigate();
+  const [roomId, setRoomId] = useState(paramRoomId || "");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
 
-  // 🧠 Auto-login if already joined before
+  // 🧠 Auto-login if user has already joined this room
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("secret_santa_user"));
-    if (savedUser && savedUser.room_id === roomId) {
-      navigate(`/dashboard/${roomId}`);
+    if (savedUser && savedUser.room_id) {
+      navigate(`/dashboard/${savedUser.room_id}`);
     }
-  }, [roomId, navigate]);
+  }, [navigate]);
 
   async function handleJoin() {
-    if (!name || !email) {
-      setStatus("Please fill in both fields.");
+    if (!roomId || !name || !email) {
+      setStatus("Please fill in all fields (Room ID, Name, Email).");
       return;
     }
 
     setStatus("Joining room...");
 
+    // Check if the room exists
     const { data: room, error: roomError } = await supabase
       .from("rooms")
       .select("id")
@@ -36,6 +38,7 @@ export default function JoinRoom() {
       return;
     }
 
+    // Add participant
     const { data, error } = await supabase
       .from("participants")
       .insert([{ room_id: roomId, name, email }])
@@ -46,12 +49,10 @@ export default function JoinRoom() {
       console.error(error);
       setStatus("Error joining room.");
     } else {
-      // ✅ Save their info locally so they can log back in later
       localStorage.setItem(
         "secret_santa_user",
         JSON.stringify({ id: data.id, room_id: roomId, name, email })
       );
-
       setStatus("Joined successfully!");
       navigate(`/dashboard/${roomId}`);
     }
@@ -59,8 +60,16 @@ export default function JoinRoom() {
 
   return (
     <div style={{ textAlign: "center", padding: "40px" }}>
-      <h2>Join Room</h2>
-      <p>Room ID: {roomId}</p>
+      <h2>Join a Secret Santa Room</h2>
+
+      {!paramRoomId && (
+        <input
+          placeholder="Enter Room ID"
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value.trim())}
+          style={{ display: "block", margin: "10px auto", padding: "8px" }}
+        />
+      )}
 
       <input
         placeholder="Your name"
@@ -75,11 +84,10 @@ export default function JoinRoom() {
         style={{ display: "block", margin: "10px auto", padding: "8px" }}
       />
       <button onClick={handleJoin} style={{ marginTop: "10px" }}>
-        Join
+        Join Room
       </button>
 
       {status && <p>{status}</p>}
     </div>
   );
 }
-
