@@ -1,12 +1,21 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../api/supabase";
 
 export default function JoinRoom() {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+
+  // 🧠 Auto-login if already joined before
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("secret_santa_user"));
+    if (savedUser && savedUser.room_id === roomId) {
+      navigate(`/dashboard/${roomId}`);
+    }
+  }, [roomId, navigate]);
 
   async function handleJoin() {
     if (!name || !email) {
@@ -16,7 +25,6 @@ export default function JoinRoom() {
 
     setStatus("Joining room...");
 
-    // Check that the room exists
     const { data: room, error: roomError } = await supabase
       .from("rooms")
       .select("id")
@@ -28,7 +36,6 @@ export default function JoinRoom() {
       return;
     }
 
-    // Add participant
     const { data, error } = await supabase
       .from("participants")
       .insert([{ room_id: roomId, name, email }])
@@ -39,7 +46,14 @@ export default function JoinRoom() {
       console.error(error);
       setStatus("Error joining room.");
     } else {
+      // ✅ Save their info locally so they can log back in later
+      localStorage.setItem(
+        "secret_santa_user",
+        JSON.stringify({ id: data.id, room_id: roomId, name, email })
+      );
+
       setStatus("Joined successfully!");
+      navigate(`/dashboard/${roomId}`);
     }
   }
 
@@ -68,3 +82,4 @@ export default function JoinRoom() {
     </div>
   );
 }
+
