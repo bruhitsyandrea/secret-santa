@@ -7,6 +7,7 @@ export default function CreateRoom() {
   const [email, setEmail] = useState("");
   const [roomId, setRoomId] = useState(null);
   const [status, setStatus] = useState("");
+  const [copied, setCopied] = useState("");
 
   async function handleCreate() {
     if (!name || !email) {
@@ -29,6 +30,19 @@ export default function CreateRoom() {
       setRoomId(data.id);
       setStatus("Room created successfully!");
     }
+  }
+
+  function handleCopyRoomId() {
+    navigator.clipboard.writeText(roomId);
+    setCopied("Room ID copied!");
+    setTimeout(() => setCopied(""), 2000);
+  }
+
+  function handleCopyInviteLink() {
+    const link = `${window.location.origin}/join/${roomId}`;
+    navigator.clipboard.writeText(link);
+    setCopied("Invite link copied!");
+    setTimeout(() => setCopied(""), 2000);
   }
 
   return (
@@ -59,12 +73,24 @@ export default function CreateRoom() {
         <div style={{ marginTop: "20px" }}>
           <p>✅ Room created!</p>
           <p>
-            Share this link with your friends:  
+            Share this link with your friends:
             <br />
             <Link to={`/join/${roomId}`}>
               {window.location.origin}/join/{roomId}
             </Link>
           </p>
+
+          <div style={{ marginTop: "10px" }}>
+            <button onClick={handleCopyRoomId}>Copy Room ID</button>
+            <button
+              onClick={handleCopyInviteLink}
+              style={{ marginLeft: "10px" }}
+            >
+              Copy Invite Link
+            </button>
+          </div>
+
+          {copied && <p style={{ color: "green" }}>{copied}</p>}
         </div>
       )}
     </div>
