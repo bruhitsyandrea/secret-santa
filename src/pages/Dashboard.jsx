@@ -27,15 +27,16 @@ export default function Dashboard() {
       return;
     }
 
-    setStatus("Assigning pairs...");
+    setStatus("Assigning pairs and sending emails...");
 
     const pairs = assignPairs(participants);
 
-    for (const pair of pairs) {
+    // Prepare all update + email tasks in parallel
+    const tasks = pairs.map(async (pair) => {
       const giver = participants.find((p) => p.id === pair.giverId);
       const receiver = participants.find((p) => p.id === pair.receiverId);
 
-      // update Supabase
+      // update DB
       await supabase
         .from("participants")
         .update({ assigned_to: receiver.id })
@@ -51,9 +52,11 @@ export default function Dashboard() {
           <p>Be creative, kind, and have fun!</p>
         `,
       });
-    }
+    });
 
-    setStatus("✅ All assignments sent!");
+    await Promise.all(tasks);
+
+    setStatus("✅ All assignments complete and emails sent!");
   }
 
   return (
@@ -66,8 +69,7 @@ export default function Dashboard() {
       <ul style={{ listStyle: "none", padding: 0 }}>
         {participants.map((p) => (
           <li key={p.id}>
-            {p.name} — {p.email}{" "}
-            {p.assigned_to ? "🎁 Assigned" : ""}
+            {p.name} — {p.email} {p.assigned_to ? "🎁 Assigned" : ""}
           </li>
         ))}
       </ul>

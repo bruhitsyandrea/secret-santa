@@ -1,4 +1,4 @@
-// Randomly assign each participant to another
+// src/utils/assignPairs.js
 export function assignPairs(participants) {
     const givers = [...participants];
     const receivers = [...participants];
@@ -9,10 +9,11 @@ export function assignPairs(participants) {
       [receivers[i], receivers[j]] = [receivers[j], receivers[i]];
     }
   
-    // Avoid self-assignment
+    // Fix any self-assignments with minimal swap
     for (let i = 0; i < givers.length; i++) {
       if (givers[i].id === receivers[i].id) {
-        return assignPairs(participants); // retry if conflict
+        const swapIndex = (i + 1) % receivers.length;
+        [receivers[i], receivers[swapIndex]] = [receivers[swapIndex], receivers[i]];
       }
     }
   
